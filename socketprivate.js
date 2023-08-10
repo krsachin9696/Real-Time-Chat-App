@@ -8,7 +8,7 @@ const server = http.createServer(app);
 
 const socketServer = new Server(server);
 
-const userBase = require("../userBase/users");
+const userBase = require("./userBase/users");
 
 // express solves routing and middleware problems for developers
 app.get("/", function (req, res) {
