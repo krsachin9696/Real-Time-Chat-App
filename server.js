@@ -5,76 +5,75 @@ const http = require("http");
 const { Server } = require("socket.io");
 
 const server = http.createServer(app);
-
 const socketServer = new Server(server);
 
 const userBase = require("./userBase/users");
 
-// express solves routing and middleware problems for developers
+// Set up Express routes
 app.get("/", function (req, res) {
   res.sendFile(__dirname + "/index.html");
 });
 
-app.get("/script.js", function (req, res) {
-  res.sendFile(__dirname + "/script.js");
+app.get("/client.js", function (req, res) {
+  res.sendFile(__dirname + "/client.js");
 });
 
-
-
+// Start the server
 server.listen(3000, () => {
   console.log("server on port 3000");
 });
 
+// Socket.io connection handling
 socketServer.on("connection", function (socket) {
+  console.log("koi aa gaya maa");
+
+  // Handle user disconnection
   socket.on("disconnect", function () {
     console.log("bhai chala gaya");
   });
-  console.log("koi aa gaya maa");
 
+  // Handle connecting user
   socket.on("connect user", updateConnectedUsers(socket));
 
+  // Handle updating user data
   socket.on("update user", function (userData) {
     updateConnectedUsersName(socket, userData);
   });
 
-
+  // Handle searching for a friend
   socket.on("search friend", function (friendName) {
     searchFriend(friendName, socket);
   });
-  // socket.on("search friend", searchFriend(friendName, socket));
 
+  // Handle sending chat messages
   socket.on("chat message", function (chatData) {
-    // socketServer.emit("chat from server", msg);
     const friendData = userBase.getUser(chatData.friendUserName);
-
     friendData.connection.emit("chat message", chatData);
-  })
+  });
 });
 
-
-function updateConnectedUsers(socket){
-  return function (userName){
+// Helper function to update connected users
+function updateConnectedUsers(socket) {
+  return function (userName) {
     let userData = userBase.getUser(userName);
 
-    if(!userData){
+    if (!userData) {
       userData = userBase.setUserNames(socket, userName);
     }
     socket.emit("user updated", userData.data);
   };
 }
 
-function updateConnectedUsersName(socket, userData){
+// Helper function to update user's nickname
+function updateConnectedUsersName(socket, userData) {
   const userName = userData.userName;
-
   userBase.updateUser(userName, userData);
-
   userData = userBase.getUser(userName);
-
   socket.emit("user updated nickname", userData.data);
 }
 
-function searchFriend(friendName, socket){
+// Helper function to search for a friend
+function searchFriend(friendName, socket) {
   const friendData = userBase.getUser(friendName);
-
-  socket.emit("search friend", friendData?.data);   // friendData?.data: This is the data that is being sent along with the event. The ?. is the optional chaining operator, which is used to safeguard against potential null or undefined values. It checks if friendData is not null or undefined before trying to access the data property. If friendData is null or undefined, this expression will evaluate to undefine
+  socket.emit("search friend", friendData?.data);
 }

@@ -13,6 +13,7 @@ function getUser(userName) {
   return userNames[userName];
 }
 
+
 function updateUser(userName, userData) {
   const user = getUser(userName);
 
