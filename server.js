@@ -47,6 +47,7 @@ socketServer.on("connection", function (socket) {
 
   // Handle sending chat messages
   socket.on("chat message", function (chatData) {
+    
     const friendData = userBase.getUser(chatData.friendUserName);
     friendData.connection.emit("chat message", chatData);
   });
