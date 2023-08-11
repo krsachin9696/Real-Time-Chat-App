@@ -89,6 +89,8 @@ function startChat(friendData) {
   }
 }
 
+
+
 // Create chat box and send messages
 function createChatBox(friendData, socket) {
   try {
@@ -137,6 +139,10 @@ function createChatBox(friendData, socket) {
           friendUserName: friendData.userName,
           sentBy: user,
         });
+
+        // Display the sent message in the chat
+        displayMessage(chat, msg, user.nickName, "outgoing");
+
         inp.value = "";
       });
     }
@@ -144,6 +150,20 @@ function createChatBox(friendData, socket) {
     console.error("Error creating chat box:", error);
   }
 }
+
+
+// Display a message in the chat box
+function displayMessage(chat, message, senderName, messageType) {
+  const messageElement = document.createElement("li");
+  messageElement.innerText = message;
+  messageElement.classList.add(messageType);
+
+  chat.appendChild(messageElement);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// ...
+
 
 // Handle incoming chat messages
 socket.on("chat message", function (chatData) {
